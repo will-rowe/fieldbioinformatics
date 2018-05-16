@@ -1,0 +1,32 @@
+### tested with ansible 2.3.1 and ubuntu 16.04 cloud image on CLIMB
+
+---
+
+- hosts: localhost
+  gather_facts: false
+
+  tasks:
+  - name: load users and  passwords
+    include_vars: users.yml
+    tags: users
+
+  - name: create users
+    user: name="{{ item.key }}" password="{{ item.value }}" shell="/bin/bash" update_password=on_create
+    with_dict: "{{ user_passwords }}"
+    register: user_results
+    tags: users
+
+  - name: update apt cache
+    apt: update_cache=yes
+
+  - name: install packages
+    apt: name={{ item }} state=present
+    with_items:
+      - bzip2
+
+  - name: install conda and conda packages
+    include_tasks: conda.yml
+    become_user: "{{ item.item.key }}"
+    with_items:
+      - "{{ user_results.results }}"
+

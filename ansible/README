@@ -1,0 +1,14 @@
+
+Ansible scripts by Nick Loman and Radoslaw Poplawski (originated during Porecamp project)
+
+From scratch ubuntu 16 install:
+
+apt-get install software-properties-common
+apt-add-repository ppa:ansible/ansible
+apt-get update
+apt-get install ansible
+
+python generate_user_passwords.py user1:pass1 user2:pass2 > users.yml
+
+ansible-playbook -s prepare_laptop.yml
+
