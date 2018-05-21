@@ -8,6 +8,9 @@ apt-add-repository ppa:ansible/ansible
 apt-get update
 apt-get install ansible
 
+apt-get install git python-pip
+pip install passlib
+
 python generate_user_passwords.py user1:pass1 user2:pass2 > users.yml
 
 From Ubuntu 16.04 as ubuntu user:

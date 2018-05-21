@@ -38,3 +38,18 @@
   - name: add extra conda channels
     command: "/home/{{ item.item.key }}/miniconda3/bin/conda config --add channels bioconda"
     become_user: "{{ item.item.key }}"
+
+  - name: install conda packages
+    command: "/home/{{ item.item.key }}/miniconda3/bin/conda install -y {{ pkg }}"
+    become_user: "{{ item.item.key }}"
+    loop_control:
+       loop_var: pkg
+    loop:
+       - nanopolish
+       - seqtk
+       - bwa
+       - minimap2
+       - miniasm
+       - samtools
+
+
