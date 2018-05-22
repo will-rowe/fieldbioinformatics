@@ -3,7 +3,6 @@ from setuptools import setup
 
 version_py = os.path.join(os.path.dirname(__file__), 'artic', 'version.py')
 version = open(version_py).read().strip().split('=')[-1].replace('"','').strip()
-print version
 long_description = """
 ``artic`` is a pipeline for working with virus sequencing data sequenced with nanopore
 """
