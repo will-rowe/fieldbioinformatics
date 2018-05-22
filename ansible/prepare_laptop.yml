@@ -71,10 +71,10 @@
   - name: install guppy
     apt: name=ont-guppy state=present
 
-  - artic primer schemes github
+  - name: artic primer schemes github
     git: repo=https://github.com/artic-network/primer-schemes.git dest=/artic force=yes
 
-  - artic pipeline
+  - name: artic pipeline
     pip: name='git+https://github.com/artic-network/fieldbioinformatics.git'
     executable: /home/nanopore/miniconda3/bin/pip
 
