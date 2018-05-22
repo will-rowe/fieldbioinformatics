@@ -8,7 +8,7 @@ import hashlib
 import re
 import argparse
 import sqlite3
-import version
+from artic import version
 
 def run_subtool(parser, args):
 	if args.command == 'extract':
@@ -33,8 +33,8 @@ class ArgumentParserWithDefaults(argparse.ArgumentParser):
 						  dest="quiet")
 
 def main():
-	parser = argparse.ArgumentParser(prog='zibra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument("-v", "--version", help="Installed zibra version",
+	parser = argparse.ArgumentParser(prog='artic', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument("-v", "--version", help="Installed Artic version",
                         action="version",
                         version="%(prog)s " + str(version.__version__))
 	subparsers = parser.add_subparsers(title='[sub-commands]', dest='command', parser_class=ArgumentParserWithDefaults)
@@ -68,7 +68,7 @@ def main():
 	parser_minion.add_argument('sample', metavar='sample', help='The name of the sample.')
 	parser_minion.add_argument('--normalise', dest='normalise', type=int, default=100, help='Normalise down to moderate coverage to save runtime.')
 	parser_minion.add_argument('--threads', type=int, default=8, help='Number of threads')
-	parser_minion.add_argument('--scheme-directory', metavar='scheme_directory', default='/zibra/zika-pipeline/schemes', help='Default scheme directory')
+	parser_minion.add_argument('--scheme-directory', metavar='scheme_directory', default='/artic/schemes', help='Default scheme directory')
 	parser_minion.add_argument('--max-haplotypes', type=int, default=1000000, metavar='max_haplotypes', help='max-haplotypes value for nanopolish')
 	parser_minion.add_argument('--read-file', metavar='read_file', help='Use alternative FASTA/FASTQ file to <sample>.fasta')
 	parser_minion.add_argument('--nanopolish-read-file', metavar='nanopolish_read_file', help='Use alternative read file (previously indexed)')

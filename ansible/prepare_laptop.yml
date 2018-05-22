@@ -68,4 +68,7 @@
     with_items:
        - "{{ user_results.results }}"
 
+  - name: install guppy
+    apt: name=ont-guppy state=present
+
 
