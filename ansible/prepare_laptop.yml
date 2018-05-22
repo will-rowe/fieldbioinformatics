@@ -64,7 +64,7 @@
 
   - name: install ont-albacore wheel
     become_user: "{{ item.item.key }}"
-    pip: name=https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.3.0-cp36-cp36m-manylinux1_x86_64.whl executable=/home/nanopore/miniconda3/bin/pip
+    pip: name=https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.3.0-cp36-cp36m-manylinux1_x86_64.whl executable=/home/{{ item.item.key }}/miniconda3/bin/pip
     with_items:
        - "{{ user_results.results }}"
 
@@ -75,6 +75,7 @@
     git: repo=https://github.com/artic-network/primer-schemes.git dest=/artic force=yes
 
   - name: artic pipeline
-    pip: name='git+https://github.com/artic-network/fieldbioinformatics.git'
-    executable: /home/nanopore/miniconda3/bin/pip
+    pip: name='git+https://github.com/artic-network/fieldbioinformatics.git' executable=/home/{{ item.item.key }}/miniconda3/bin/pip
+    with_items:
+       - "{{ user_results.results }}"
 
