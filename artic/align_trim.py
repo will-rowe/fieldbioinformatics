@@ -97,10 +97,19 @@ def find_primer(bed, pos, direction):
    closest = min([(abs(p['start'] - pos), p['start'] - pos, p) for p in bed if p['direction'] == direction], key=itemgetter(0))
    return closest
 
+def is_correctly_paired(p1, p2):
+   name1 = p1[2]['Primer_ID']
+   name2 = p2[2]['Primer_ID']
+
+   name1 = name1.replace('_LEFT', '')
+   name2 = name2.replace('_RIGHT', '')
+
+   return name1 == name2
 
 def go(args):
     if args.report:
         reportfh = open(args.report, "w")
+        print >>reportfh, "QueryName\tReferenceStart\tReferenceEnd\tPrimerPair\tPrimer1\tPrimer1Start\tPrimer2\tPrimer2Start\tIsSecondary\tIsSupplementary\tStart\tEnd\tCorrectlyPaired"
 
     bed = read_bed_file(args.bedfile)
 
@@ -125,7 +134,9 @@ def go(args):
         p1 = find_primer(bed, s.reference_start, '+')
         p2 = find_primer(bed, s.reference_end, '-')
 
-        report = "%s\t%s\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (s.query_name, s.reference_start, s.reference_end, p1[2]['Primer_ID'], p2[2]['Primer_ID'], p1[2]['Primer_ID'], abs(p1[1]), p2[2]['Primer_ID'], abs(p2[1]), s.is_secondary, s.is_supplementary, p1[2]['start'], p2[2]['end'])
+        correctly_paired = is_correctly_paired(p1, p2)
+
+        report = "%s\t%s\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d" % (s.query_name, s.reference_start, s.reference_end, p1[2]['Primer_ID'], p2[2]['Primer_ID'], p1[2]['Primer_ID'], abs(p1[1]), p2[2]['Primer_ID'], abs(p2[1]), s.is_secondary, s.is_supplementary, p1[2]['start'], p2[2]['end'], correctly_paired)
         if args.report:
             print >>reportfh, report
 
