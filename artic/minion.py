@@ -17,8 +17,14 @@ def run(parser, args):
 	log = "%s.minion.log.txt" % (args.sample)
 	logfh = open(log, 'w')
 
-	ref = "%s/%s/V1/%s.reference.fasta" % (args.scheme_directory, args.scheme, args.scheme)
-	bed = "%s/%s/V1/%s.scheme.bed" % (args.scheme_directory, args.scheme, args.scheme)
+	if args.scheme.find('/') != -1:
+		scheme_name, scheme_version = args.scheme.split('/')
+	else:
+		scheme_name = args.scheme
+		scheme_version = "V1"
+
+	ref = "%s/%s/%s/%s.reference.fasta" % (args.scheme_directory, scheme_name, scheme_version, scheme_name)
+	bed = "%s/%s/%s/%s.scheme.bed" % (args.scheme_directory, scheme_name, scheme_version, scheme_name)
 
 	if args.read_file:
 		read_file = args.read_file
@@ -60,8 +66,8 @@ def run(parser, args):
 		else:
 			indexed_nanopolish_file = read_file
 
-		cmds.append("nanopolish variants -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
-		cmds.append("nanopolish variants -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+		cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+		cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
 
 		#python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
 
