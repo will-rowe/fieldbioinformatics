@@ -21,6 +21,10 @@ def run_subtool(parser, args):
 		import minion as submodule
 	if args.command == 'gather':
 		import gather as submodule
+	if args.command == 'rampart':
+		import rampart as submodule
+	if args.command == 'filter':
+		import filter as submodule
 
 	# run the chosen submodule.
 	submodule.run(parser, args)
@@ -78,25 +82,35 @@ def main():
 	# gather
 	parser_gather = subparsers.add_parser('gather', help='Gather up demultiplexed files')
 	parser_gather.add_argument('directory', metavar='directory', help='Albacore results directory.')
+	parser_gather.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
+	parser_gather.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
+	parser_gather.add_argument('--prefix', help='Prefix for gathered files')
+        parser_gather.add_argument('--guppy', action='store_true', help='Gather up files produced by Guppy/Dogfish')
 	parser_gather.set_defaults(func=run_subtool)
 
-	# import
-	"""parser_import = subparsers.add_parser('import',
-	                                      help='Import files into a poredb database')
-	parser_import.add_argument('db', metavar='DB',
-	                           help='The poredb database.')
-	parser_import.add_argument('fofn', metavar='FOFN',
-	                           help='A file containing a list of file names.')
-	parser_import.add_argument('--alternate-path', metavar='alternate_path')
-	parser_import.set_defaults(func=run_subtool)
-	"""
+	# filter
+	parser_filter = subparsers.add_parser('filter', help='Filter FASTQ files by length')
+	parser_filter.add_argument('filename', metavar='filename', help='FASTQ file.')
+	parser_filter.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
+	parser_filter.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
+	parser_filter.set_defaults(func=run_subtool)
+
+	# rampart
+	parser_rampart = subparsers.add_parser('rampart', help='Make output file for RAMPART')
+	parser_rampart.add_argument('scheme', metavar='scheme', help='The name of the scheme.')
+	parser_rampart.add_argument('sample', metavar='sample', help='The name of the sample.')
+	parser_rampart.add_argument('--read-file', metavar='read_file', help='Use alternative FASTA/FASTQ file to <sample>.fasta')
+	parser_rampart.set_defaults(func=run_subtool)
 
 	args = parser.parse_args()
 
 	#if args.quiet:
 	#	logger.setLevel(logging.ERROR)
 
-	args.func(parser, args)
+	if args.command:
+		args.func(parser, args)
+	else:
+		parser.print_usage()
 
 if __name__ == "__main__":
 	main()
