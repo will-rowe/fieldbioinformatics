@@ -21,7 +21,7 @@ git clone git@github.com:artic-network/artic-ebov
 
 Pull the desired branch from the upstream repository. This method will retain the commit history without modification.
 ```bash
-git pull https://github.com/artic-network/fieldbioinformatics.git master
+git pull -m "merging" https://github.com/artic-network/fieldbioinformatics.git master
 ```
 
 Push the merge to your GitHub repository
