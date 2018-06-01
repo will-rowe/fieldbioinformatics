@@ -27,8 +27,7 @@ git remote add upstream https://github.com/artic-network/fieldbioinformatics
 
 Fetch the branches and their respective commits from the upstream repository. Commits to master will be stored in a local branch, upstream/master.
 ```bash
-git checkout master
-git merge upstream/master
+git fetch upstream/master
 ```
 
 Merge the changes from upstream/master into your local master branch. This brings your fork's master branch into sync with the upstream repository, without losing your local changes.
