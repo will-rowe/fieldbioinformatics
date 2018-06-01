@@ -17,17 +17,17 @@ git push origin master
 git clone git@github.com:artic-network/artic-ebov
 ```
 
-### Merging with the original repo
-
 Add fieldbioinformatics as the upstream repo:
 ```bash
 cd artic-ebov
 git remote add upstream https://github.com/artic-network/fieldbioinformatics
 ```
 
+### Merging with the original repo
+
 Fetch the branches and their respective commits from the upstream repository. Commits to master will be stored in a local branch, upstream/master.
 ```bash
-git fetch upstream/master
+git fetch upstream
 ```
 
 Merge the changes from upstream/master into your local master branch. This brings your fork's master branch into sync with the upstream repository, without losing your local changes.
