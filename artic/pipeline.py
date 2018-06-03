@@ -81,7 +81,7 @@ def main():
 
 	# gather
 	parser_gather = subparsers.add_parser('gather', help='Gather up demultiplexed files')
-	parser_gather.add_argument('directory', metavar='directory', help='Albacore results directory.')
+	parser_gather.add_argument('directory', nargs='+', metavar='directory', help='Albacore results directory or directories.')
 	parser_gather.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
 	parser_gather.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
 	parser_gather.add_argument('--prefix', help='Prefix for gathered files')
