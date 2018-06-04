@@ -21,13 +21,13 @@ def run(parser, args):
 				
 
 		if not fast5.is_open:
-			print >>sys.stderr, "Skipping read: %s" % (fast5.filename)
+			print("Skipping read: %s" % (fast5.filename), file=sys.stderr)
 			continue
 
 		read_flowcell_id = fast5.get_flowcell_id()
 		flowcells.add(read_flowcell_id)
 		if len(flowcells) != 1:
-			print >>sys.stderr, "ABORTED: More than one flowcell found in dataset: %s" % (flowcells,)
+			print("ABORTED: More than one flowcell found in dataset: %s" % (flowcells,), file=sys.stderr)
 			raise SystemExit
 
 		#if flowcell_id != read_flowcell_id:
@@ -36,7 +36,7 @@ def run(parser, args):
 
 		read_id = fast5.get_read_id()
 		if read_id in reads:
-			print >>sys.stderr, "Skipping duplicate read: %s" % (read_id)
+			print("Skipping duplicate read: %s" % (read_id), file=sys.stderr)
 			continue
 
 		reads.add(read_id)
@@ -44,13 +44,13 @@ def run(parser, args):
 		fas = fast5.get_fastas('fwd')
 		for read in fas:
 			if read:
-				print read
+				print(read)
 		fast5.close()
 
 		i += 1
 
 		if i % 1000 == 0:
-			print >>sys.stderr, "Extracted %s reads" % (i,)
+			print("Extracted %s reads" % (i,), file=sys.stderr)
 
 # zibra.py 
 #  run

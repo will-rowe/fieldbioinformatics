@@ -13,10 +13,8 @@ from collections import defaultdict
 #   -- always unique read ID
 
 def run(parser, args):
-	print args.directory
-
 	if len(args.directory) and not args.prefix:
-		print >>sys.stderr, "Must supply a prefix if gathering multiple directories!"
+		print("Must supply a prefix if gathering multiple directories!", file=sys.stderr)
 		raise SystemExit
 
 	if args.prefix:
@@ -40,12 +38,11 @@ def run(parser, args):
 
 			fastq[barcode_directory].extend([root+'/'+f for f in files if f.endswith('.fastq')])
 
-	for barcode_directory, fastq in fastq.items():
-		print barcode_directory, fastq
+	for barcode_directory, fastq in list(fastq.items()):
 		if len(fastq):
 			fastq_outfn = "%s_%s.fastq" % (prefix, barcode_directory)
 			outfh = open(fastq_outfn, "w")
-			print >>sys.stderr, "Processing %s files in %s" % (len(fastq), barcode_directory)
+			print("Processing %s files in %s" % (len(fastq), barcode_directory), file=sys.stderr)
 
 			dups = set()
 			uniq = 0
@@ -67,11 +64,11 @@ def run(parser, args):
 
 			outfh.close()
 
-			print "%s\t%s\t%s" % (fastq_outfn, total, uniq)
+			print("%s\t%s\t%s" % (fastq_outfn, total, uniq))
 
 	all_fastq_outfh.close()
 
-	print >>sys.stderr, "Collecting summary files\n"
+	print("Collecting summary files\n", file=sys.stderr)
 
 	dfs = []
 

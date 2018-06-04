@@ -25,7 +25,7 @@ def get_basecallers(fast5):
 	basecallers = []
 	analyses = fast5.hdf5file.get('Analyses')
 	if analyses:
-		for k, g in analyses.iteritems():
+		for k, g in analyses.items():
 			m = matcher.match(k)
 			if m:
 				basecaller_name = g.attrs['name']
@@ -36,8 +36,8 @@ def get_basecallers(fast5):
 	return basecallers
 
 def print_basecallers(basecallers):
-	for key, item in basecallers.iteritems():
-		print "%s: %d reads" % (key, item)
+	for key, item in basecallers.items():
+		print("%s: %d reads" % (key, item))
 
 def run(parser, args):
 	flowcells = set()
@@ -48,7 +48,7 @@ def run(parser, args):
 	for fast5 in Fast5FileSet(args.directory):
 		#, 0, basecaller):
 		if not fast5.is_open:
-			print >>sys.stderr, "Skipping read: %s" % (fast5.filename)
+			print("Skipping read: %s" % (fast5.filename), file=sys.stderr)
 			continue
 
 		bcs = get_basecallers(fast5)

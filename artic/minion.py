@@ -8,7 +8,7 @@ from clint.textui import colored, puts, indent
 def get_nanopolish_header(ref):
 	recs = list(SeqIO.parse(open(ref), "fasta"))
 	if len (recs) != 1:
-		print >>sys.stderr, "FASTA has more than one sequence"
+		print("FASTA has more than one sequence", file=sys.stderr)
 		raise SystemExit
 
 	return  "%s:%d-%d" % (recs[0].id, 1, len(recs[0])+1)
@@ -32,10 +32,10 @@ def run(parser, args):
 		read_file = "%s.fasta" % (args.sample)
 
 	if not os.path.exists(ref):
-		print colored.red('Scheme reference file not found: ') + ref
+		print(colored.red('Scheme reference file not found: ') + ref)
 		raise SystemExit
 	if not os.path.exists(bed):
-		print colored.red('Scheme BED file not found: ') + bed
+		print(colored.red('Scheme BED file not found: ') + bed)
 		raise SystemExit
 
 	cmds = []
@@ -52,8 +52,8 @@ def run(parser, args):
 		normalise_string = '--normalise %d' % (args.normalise)
 	else:
 		normalise_string = ''
-	cmds.append("align_trim.py --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-	cmds.append("align_trim.py %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+	cmds.append("align_trim --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+	cmds.append("align_trim %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
 	cmds.append("samtools index %s.trimmed.sorted.bam" % (args.sample))
 	cmds.append("samtools index %s.primertrimmed.sorted.bam" % (args.sample))
 
@@ -75,20 +75,20 @@ def run(parser, args):
 		#nanopolish phase-reads --reads $sample.fasta --bam $sample.trimmed.sorted.bam --genome $ref $sample.vcf
 
 		# 8) variant frequency plot
-		cmds.append("vcfextract.py %s > %s.variants.tab" % (args.sample, args.sample))
+		cmds.append("vcfextract %s > %s.variants.tab" % (args.sample, args.sample))
 
 		# 8) filter the variants and produce a consensus
 		# here we use the vcf file without primer binding site trimming (to keep nanopolish happy with flanks)
 		# but we use the primertrimmed sorted bam file in order that primer binding sites do not count
 		# for the depth calculation to determine any low coverage sites that need masking
-		cmds.append("margin_cons.py %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
+		cmds.append("margin_cons %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
 
 	for cmd in cmds:
-		print >>sys.stderr, colored.green("Running: ") + cmd
-		print >>logfh, cmd
+		print(colored.green("Running: ") + cmd, file=sys.stderr)
+		print(cmd, file=logfh)
 		retval = os.system(cmd)
 		if retval != 0:
-			print >>sys.stderr, colored.red('Command failed:' ) + cmd
+			print(colored.red('Command failed:' ) + cmd, file=sys.stderr)
 
 	logfh.close()
 

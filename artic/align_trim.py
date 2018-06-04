@@ -6,7 +6,7 @@
 import pysam
 import sys
 from copy import copy
-from vcftagprimersites import read_bed_file
+from .vcftagprimersites import read_bed_file
 from collections import defaultdict
 
 def check_still_matching_bases(s):
@@ -15,7 +15,7 @@ def check_still_matching_bases(s):
             return True
     return False
 
-def trim(cigar, s, start_pos, end):
+def trim(args, cigar, s, start_pos, end):
     if not end:
         pos = s.pos
     else:
@@ -30,7 +30,7 @@ def trim(cigar, s, start_pos, end):
             flag, length = cigar.pop(0)
 
         if args.verbose:
-            print >>sys.stderr,  "Chomped a %s, %s" % (flag, length)
+            print("Chomped a %s, %s" % (flag, length), file=sys.stderr)
 
         if flag == 0:
             ## match
@@ -63,11 +63,11 @@ def trim(cigar, s, start_pos, end):
 
     extra = abs(pos - start_pos)
     if args.verbose:
-        print >> sys.stderr, "extra %s" % (extra)
+        print("extra %s" % (extra), file=sys.stderr)
     if extra:
         if flag == 0:
             if args.verbose:
-                print >>sys.stderr,  "Inserted a %s, %s" % (0, extra)
+                print("Inserted a %s, %s" % (0, extra), file=sys.stderr)
 
             if end:
                 cigar.append((0, extra))
@@ -79,7 +79,7 @@ def trim(cigar, s, start_pos, end):
         s.pos = pos - extra
 
     if args.verbose:
-        print >>sys.stderr,  "New pos: %s" % (s.pos)
+        print("New pos: %s" % (s.pos), file=sys.stderr)
 
     if end:
         cigar.append((4, eaten))
@@ -91,25 +91,24 @@ def trim(cigar, s, start_pos, end):
     #print >>sys.stderr,  s.query_name, oldcigarstring[0:50], s.cigarstring[0:50]
 
 def find_primer(bed, pos, direction):
-   # {'Amplicon_size': '1874', 'end': 7651, '#Region': 'region_4', 'start': 7633, 'Coords': '7633', "Sequence_(5-3')": 'GCTGGCCCGAAATATGGT', 'Primer_ID': '16_R'}
-   from operator import itemgetter
+    from operator import itemgetter
 
-   closest = min([(abs(p['start'] - pos), p['start'] - pos, p) for p in bed if p['direction'] == direction], key=itemgetter(0))
-   return closest
+    closest = min([(abs(p['start'] - pos), p['start'] - pos, p) for p in bed if p['direction'] == direction], key=itemgetter(0))
+    return closest
 
 def is_correctly_paired(p1, p2):
-   name1 = p1[2]['Primer_ID']
-   name2 = p2[2]['Primer_ID']
+    name1 = p1[2]['Primer_ID']
+    name2 = p2[2]['Primer_ID']
 
-   name1 = name1.replace('_LEFT', '')
-   name2 = name2.replace('_RIGHT', '')
+    name1 = name1.replace('_LEFT', '')
+    name2 = name2.replace('_RIGHT', '')
 
-   return name1 == name2
+    return name1 == name2
 
 def go(args):
     if args.report:
         reportfh = open(args.report, "w")
-        print >>reportfh, "QueryName\tReferenceStart\tReferenceEnd\tPrimerPair\tPrimer1\tPrimer1Start\tPrimer2\tPrimer2Start\tIsSecondary\tIsSupplementary\tStart\tEnd\tCorrectlyPaired"
+        print("QueryName\tReferenceStart\tReferenceEnd\tPrimerPair\tPrimer1\tPrimer1Start\tPrimer2\tPrimer2Start\tIsSecondary\tIsSupplementary\tStart\tEnd\tCorrectlyPaired", file=reportfh)
 
     bed = read_bed_file(args.bedfile)
 
@@ -124,11 +123,11 @@ def go(args):
         ## a primer site, trim it off
 
         if s.is_unmapped:
-            print >>sys.stderr, "%s skipped as unmapped" % (s.query_name)
+            print("%s skipped as unmapped" % (s.query_name), file=sys.stderr)
             continue
 
         if s.is_supplementary:
-            print >>sys.stderr, "%s skipped as supplementary" % (s.query_name)
+            print("%s skipped as supplementary" % (s.query_name), file=sys.stderr)
             continue
 
         p1 = find_primer(bed, s.reference_start, '+')
@@ -138,10 +137,10 @@ def go(args):
 
         report = "%s\t%s\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d" % (s.query_name, s.reference_start, s.reference_end, p1[2]['Primer_ID'], p2[2]['Primer_ID'], p1[2]['Primer_ID'], abs(p1[1]), p2[2]['Primer_ID'], abs(p2[1]), s.is_secondary, s.is_supplementary, p1[2]['start'], p2[2]['end'], correctly_paired)
         if args.report:
-            print >>reportfh, report
+            print(report, file=reportfh)
 
         if args.verbose:
-            print >>sys.stderr, report
+            print(report, file=sys.stderr)
 
         ## if the alignment starts before the end of the primer, trim to that position
 
@@ -152,10 +151,10 @@ def go(args):
                 primer_position = p1[2]['end']
 
             if s.reference_start < primer_position:
-                trim(cigar, s, primer_position, 0)
+                trim(args, cigar, s, primer_position, 0)
             else:
                 if args.verbose:
-                    print >>sys.stderr, "ref start %s >= primer_position %s" % (s.reference_start, primer_position)
+                    print("ref start %s >= primer_position %s" % (s.reference_start, primer_position), file=sys.stderr)
 
             if args.start:
                 primer_position = p2[2]['start']
@@ -163,12 +162,12 @@ def go(args):
                 primer_position = p2[2]['end']
 
             if s.reference_end > primer_position:
-                trim(cigar, s, primer_position, 1)
+                trim(args, cigar, s, primer_position, 1)
             else:
                 if args.verbose:
-                    print >>sys.stderr, "ref end %s >= primer_position %s" % (s.reference_end, primer_position)
-        except Exception, e:
-            print >>sys.stderr, "problem %s" % (e,)
+                    print("ref end %s >= primer_position %s" % (s.reference_end, primer_position), file=sys.stderr)
+        except Exception as e:
+            print("problem %s" % (e,), file=sys.stderr)
             pass
 
         if args.normalise:
@@ -178,14 +177,6 @@ def go(args):
             if counter[pair] > args.normalise:
                 continue
 
-        ## if the alignment starts before the end of the primer, trim to that position
-#      trim(s, s.reference_start + 40, 0)
-#      trim(s, s.reference_end - 40, 1)
-#
-#      outfile.write(s)
-#   except Exception:
-#      pass
-
         if not check_still_matching_bases(s):
              continue
 
@@ -193,17 +184,19 @@ def go(args):
 
     reportfh.close()
 
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Trim alignments from an amplicon scheme.')
+    parser.add_argument('bedfile', help='BED file containing the amplicon scheme')
+    parser.add_argument('--normalise', type=int, help='Subsample to n coverage')
+    parser.add_argument('--report', type=str, help='Output report to file')
+    parser.add_argument('--start', action='store_true', help='Trim to start of primers instead of ends')
+    parser.add_argument('--verbose', action='store_true', help='Debug mode')
+
+    args = parser.parse_args()
+    go(args)
+
 
 if __name__ == "__main__":
-	import argparse
-
-	parser = argparse.ArgumentParser(description='Trim alignments from an amplicon scheme.')
-	parser.add_argument('bedfile', help='BED file containing the amplicon scheme')
-	parser.add_argument('--normalise', type=int, help='Subsample to n coverage')
-	parser.add_argument('--report', type=str, help='Output report to file')
-	parser.add_argument('--start', action='store_true', help='Trim to start of primers instead of ends')
-	parser.add_argument('--verbose', action='store_true', help='Debug mode')
-
-	args = parser.parse_args()
-	go(args)
-
+    main()

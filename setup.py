@@ -30,6 +30,9 @@ setup(
     entry_points={
         'console_scripts': [
             'artic=artic.pipeline:main',
+            'align_trim=artic.align_trim:main',
+            'margin_cons=artic.margin_cons:main',
+            'vcfextract=artic.vcfextract:main',
         ],
     },
     author_email="n.j.loman@bham.ac.uk",

@@ -24,7 +24,7 @@ def read_bed_file(fn):
 				elif 'RIGHT' in row[3]:
 					bedrow['direction'] = '-'
 				else:
-					print >>sys.stderr, "Malformed BED file!" 
+					print("Malformed BED file!", file=sys.stderr) 
 					raise SystemExit
 
 			if bedrow['direction'] == '+':
@@ -44,7 +44,7 @@ def overlaps(coords, pos):
 
 if __name__ == "__main__":
 	if sys.argv[1] not in sets:
-		print "Invalid set"
+		print("Invalid set")
 		raise SystemExit
 
 	bedfile = read_bed_file(sys.argv[1])
