@@ -11,7 +11,8 @@ From Ubuntu 16.04 as ubuntu user:
 sudo apt-get install software-properties-common
 sudo apt-add-repository ppa:ansible/ansible
 sudo apt-get update
-sudo apt-get install ansible```
+sudo apt-get install ansible
+```
 
 - run playbook
 `sudo ansible-playbook -i hosts prepare_usb.yml`
@@ -38,7 +39,7 @@ parted /dev/sdx
 
 ```
 
-- create filesystems
+- create filesystems:
 ```
 mkfs.vfat /dev/sdx1
 mkfs.ext4 /dev/sdx2
@@ -58,7 +59,7 @@ sudo apt install extlinux
 extlinux --install /boot`
 ```
 
-- extlinux config (/boot/extlinux.conf (find UUID: `blkid /dev/sdx2`)
+- extlinux config (/boot/extlinux.conf (find UUID: `blkid /dev/sdx2`):
 ```
 DEFAULT Ubuntu
 PROMPT 1
