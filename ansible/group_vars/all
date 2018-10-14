@@ -1,0 +1,3 @@
+localuser: ubuntu
+mountpoint: /chroot
+imagename: /data/usb.img

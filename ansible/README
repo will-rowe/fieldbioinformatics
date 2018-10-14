@@ -1,23 +1,71 @@
 
 Ansible scripts by Nick Loman and Radoslaw Poplawski (originated during Porecamp project)
 
-## Getting started
-
-apt-get install software-properties-common
-apt-add-repository ppa:ansible/ansible
-apt-get update
-apt-get install ansible
-
-apt-get install git python-pip
-pip install passlib
-
-python generate_user_passwords.py user1:pass1 user2:pass2 > users.yml
+### Getting started
 
 From Ubuntu 16.04 as ubuntu user:
 
-ansible-playbook --become --become-method sudo prepare_laptop.yml
+- install Ansible
+
+```
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install ansible```
+
+- run playbook
+`sudo ansible-playbook -i hosts prepare_usb.yml`
+
+### [USB images](https://artic.climb.ac.uk/)
+
+#### Recommened USB writing software:
+- dd
+- [Etcher](https://etcher.io/)
+- [Rufus](https://rufus.akeo.ie/)
 
 
-From Docker container:
+### (Optional) Build your own Ubuntu image from scratch:
 
-ansible-playbook --become --become-method su prepare_laptop.yml
+Prepare target drive (sdx):
+-  parittion the drive
+```
+parted /dev/sdx
+  mklabel gpt
+  mkpart primary fat32 1MiB 500MiB
+  mkpart primary ext4 500MiB 100%
+  set 1 esp on
+  set 2 legacy_boot on
+
+```
+
+- create filesystems
+```
+mkfs.vfat /dev/sdx1
+mkfs.ext4 /dev/sdx2
+```
+
+- Start the Ubuntu installer
+  TOOD:
+
+- reinstall GRUB: `grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=boot --recheck`
+
+- make drive BIOS bootable
+```
+sudo dd if=/usrlib/syslinux/mbt/gptmbr.bin of=/dev/sdx bs=440 count=1
+sudo rm /vmlinuz ; sudo ln -s /boot/vmlinuz-$(uname -r) /vmlinuz
+sudo rm /initrd.img ; sudo ln -s /boot/initrd.img-$(uname -r) /vmlinuz
+sudo apt install extlinux
+extlinux --install /boot`
+```
+
+- extlinux config (/boot/extlinux.conf (find UUID: `blkid /dev/sdx2`)
+```
+DEFAULT Ubuntu
+PROMPT 1
+TIMEOUT 50
+
+LABEL Ubuntu
+  KERNEL /vmlinuz
+  INITRD /initrd.img
+  APPEND root=UUID=$UUID
+```

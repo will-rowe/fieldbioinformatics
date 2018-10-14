@@ -1,0 +1,11 @@
+---
+
+- hosts: local
+  connection: local
+
+  tasks:
+  - name: umount image
+    command: umount -R -lf{{ mountpoint }}
+
+  - name: loopback detach
+    command: losetup -d {{ loopback.stdout }}
