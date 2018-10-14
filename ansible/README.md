@@ -5,7 +5,7 @@ Ansible scripts by Nick Loman and Radoslaw Poplawski (originated during Porecamp
 
 From Ubuntu 16.04 as ubuntu user:
 
-- install Ansible
+- install Ansible:
 
 ```
 sudo apt-get install software-properties-common
@@ -14,7 +14,7 @@ sudo apt-get update
 sudo apt-get install ansible
 ```
 
-- run playbook
+- run playbook:
 `sudo ansible-playbook -i hosts prepare_usb.yml`
 
 ### [USB images](https://artic.climb.ac.uk/)
@@ -28,7 +28,7 @@ sudo apt-get install ansible
 ### (Optional) Build your own Ubuntu image from scratch:
 
 Prepare target drive (sdx):
--  parittion the drive
+-  parittion the drive:
 ```
 parted /dev/sdx
   mklabel gpt
@@ -45,21 +45,21 @@ mkfs.vfat /dev/sdx1
 mkfs.ext4 /dev/sdx2
 ```
 
-- Start the Ubuntu installer
-  TOOD:
+Start the Ubuntu installer:
+  TODO:
 
-- reinstall GRUB: `grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=boot --recheck`
+Reinstall GRUB: `grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=boot --recheck`
 
-- make drive BIOS bootable
+Make drive BIOS bootable:
 ```
 sudo dd if=/usrlib/syslinux/mbt/gptmbr.bin of=/dev/sdx bs=440 count=1
 sudo rm /vmlinuz ; sudo ln -s /boot/vmlinuz-$(uname -r) /vmlinuz
 sudo rm /initrd.img ; sudo ln -s /boot/initrd.img-$(uname -r) /vmlinuz
 sudo apt install extlinux
-extlinux --install /boot`
+sudo extlinux --install /boot
 ```
 
-- extlinux config (/boot/extlinux.conf (find UUID: `blkid /dev/sdx2`):
+- extlinux config (`/boot/extlinux.conf` (find UUID: `blkid /dev/sdx2`):
 ```
 DEFAULT Ubuntu
 PROMPT 1
