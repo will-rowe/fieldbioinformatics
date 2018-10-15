@@ -28,7 +28,7 @@ sudo apt-get install ansible
 ### (Optional) Build your own Ubuntu image from scratch:
 
 Prepare target drive (sdx):
--  parittion the drive:
+-  partition the drive:
 ```
 parted /dev/sdx
   mklabel gpt
@@ -54,7 +54,7 @@ Make drive BIOS bootable:
 ```
 sudo dd if=/usrlib/syslinux/mbt/gptmbr.bin of=/dev/sdx bs=440 count=1
 sudo rm /vmlinuz ; sudo ln -s /boot/vmlinuz-$(uname -r) /vmlinuz
-sudo rm /initrd.img ; sudo ln -s /boot/initrd.img-$(uname -r) /vmlinuz
+sudo rm /initrd.img ; sudo ln -s /boot/initrd.img-$(uname -r) /initrd.img
 sudo apt install extlinux
 sudo extlinux --install /boot
 ```
