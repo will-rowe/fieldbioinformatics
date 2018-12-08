@@ -189,7 +189,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Trim alignments from an amplicon scheme.')
     parser.add_argument('bedfile', help='BED file containing the amplicon scheme')
-    parser.add_argument('--normalise', type=int, help='Subsample to n coverage')
+    parser.add_argument('--normalise', type=int, help='Subsample to n coverage per strand')
     parser.add_argument('--report', type=str, help='Output report to file')
     parser.add_argument('--start', action='store_true', help='Trim to start of primers instead of ends')
     parser.add_argument('--verbose', action='store_true', help='Debug mode')
