@@ -5,7 +5,7 @@
 
   tasks:
   - name: umount image
-    command: umount -R -lf {{ mountpoint }}
+    command: umount -R -l {{ mountpoint }}
 
   - name: loopback detach
     command: losetup -D

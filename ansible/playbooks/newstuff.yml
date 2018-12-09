@@ -18,6 +18,19 @@
        owner: "{{ localuser }}"
        group: "{{ localuser }}"
 
+  - name: dogfishd.service
+    copy:
+       src: ../configs/dogfishd.service
+       dest: /etc/systemd/system/dogfishd.service
+
+  - name: reload configs
+    systemd: daemon_reload=yes
+
+  - name: enable dogfishd
+    systemd:
+       name: dogfishd
+       enabled: True 
+
   - name: desktop icon directoy
     file:
        path: /home/{{ localuser }}/.local/share/icons
@@ -145,8 +158,64 @@
     become: yes
     become_user: "{{ localuser }}"
 
+  - name: test if conda is installed
+    stat: path="/home/{{ localuser }}/miniconda3/envs/artic-rampart"
+    register: condarampartinstalled
+    become: yes
+    become_user: "{{ localuser }}"
+
   - name: create conda environment for rampart
-    command: "/home/{{ localuser }}/miniconda3/bin/conda env create -f /home/{{ localuser }}/rampart/environment.yml"
+    command: "/home/{{ localuser }}/miniconda3/bin/conda env create -f /home/{{ localuser }}/artic/rampart/environment.yml"
     become: yes
     become_user: "{{ localuser }}" 
+    when: not condarampartinstalled.stat.exists
+
+  - name: rampart yarn
+    shell: source /home/{{ localuser }}/miniconda3/bin/activate artic-rampart && cd /home/{{ localuser }}/artic/rampart && yarn
+    become: yes
+    become_user: "{{ localuser }}"
+    args:
+       executable: /bin/bash
+
+  - name: rambaut porechop fork github
+    git: repo=https://github.com/rambaut/Porechop.git dest=/home/{{ localuser }}/artic/porechop force=yes
+    become: yes
+    become_user: "{{ localuser }}"
+
+  - name: install porechop
+    shell: source /home/{{ localuser }}/miniconda3/bin/activate artic-rampart && cd /home/{{ localuser }}/artic/porechop && python setup.py install
+    become: yes
+    become_user: "{{ localuser }}"
+    args:
+       executable: /bin/bash
+
+  - name: clone artic-outbreak github
+    git: repo=https://github.com/artic-network/artic-workshop.git dest=/home/{{ localuser }}/artic/workshop force=yes
+    become: yes
+    become_user: "{{ localuser }}"
+
+  - name: test if conda is installed
+    stat: path="/home/{{ localuser }}/miniconda3/envs/artic-workshop"
+    register: condaworkshopinstalled
+    become: yes
+    become_user: "{{ localuser }}"
+
+  - name: conda workshop environment
+    command: "/home/{{ localuser }}/miniconda3/bin/conda env create -f /home/{{ localuser }}/artic/workshop/environment.yml"
+    become: yes
+    become_user: "{{ localuser }}"
+    when: not condaworkshopinstalled.stat.exists
+
+  - name: artic pipeline
+    git: repo=https://github.com/artic-network/fieldbioinformatics.git dest=/home/{{ localuser }}/artic/fieldbioinformatics force=yes
+    become: yes
+    become_user: "{{ localuser }}"
+
+  - name: install artic pipeline
+    shell: source /home/{{ localuser }}/miniconda3/bin/activate artic-workshop && cd  /home/{{ localuser }}/artic/fieldbioinformatics && python setup.py install
+    become: yes
+    become_user: "{{ localuser }}"
+    args:
+       executable: /bin/bash
+
 

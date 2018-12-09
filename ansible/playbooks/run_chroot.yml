@@ -28,9 +28,10 @@
       owner: root
       group: root
 
+#  - name: install conda
+#    include_tasks: conda.yml 
 
-  - name: install conda
-    include_tasks: conda.yml 
-
-  - name: install software
-    include_tasks: software.yml
+#  - name: install software
+#    include_tasks: software.yml
+  - name: install new stuff
+    include_tasks: newstuff.yml
