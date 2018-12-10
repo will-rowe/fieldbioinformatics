@@ -4,8 +4,10 @@
     apt: update_cache=yes
 
   - name: install packages
-    apt: name={{ item }} state=present
-    with_items:
+    apt: name={{ packages }} state=present
+    vars:
+      packages:
+      - vim
       - bzip2
       - git
       - bioperl
@@ -63,3 +65,23 @@
     pip: name='git+https://github.com/artic-network/fieldbioinformatics.git' executable=/home/{{ localuser }}/miniconda3/bin/pip
     become: yes
     become_user: "{{ localuser }}"
+
+  - name: install dogfish
+    apt: name=ont-dogfish state=present allow_unauthenticated=yes
+
+  - name: create basecalled directory
+    file:
+       path: /data/basecalled
+       recurse: yes
+       state: directory
+       owner: ubuntu
+       group: ubuntu
+
+  - name: create dogfish log directory
+    file:
+       path: /var/log/dogfish
+       state: directory
+       owner: ubuntu
+       group: ubuntu
+
+
