@@ -28,6 +28,36 @@
       owner: root
       group: root
 
+  - name: copy findbootdev
+    copy:
+      src: scripts/findbootdev
+      dest: /usr/local/bin/findbootdev
+      owner: root
+      group: root
+      mode: 755 
+
+  - name: copy fixbootdev
+    copy:
+      src: scripts/fixbootdev
+      dest: /usr/local/sbin/fixbootdev
+      owner: root
+      group: root
+      mode: 755 
+
+  - name: install software-properties-common
+    apt:
+      name: software-properties-common
+      state: present
+
+  - name: add ansible repository
+    apt_repository:
+      repo: ppa:ansible/ansible 
+
+  - name: apt update
+    apt:
+      name: ansible
+      update_cache: yes
+      state: present
 
   - name: install conda
     include_tasks: conda.yml 
