@@ -44,26 +44,26 @@
       group: root
       mode: 755 
 
+  - name: copy makeswapfile
+    copy:
+      src: scripts/makeswapfile
+      dest: /usr/local/sbin/makeswapfile
+      owner: root
+      group: root
+      mode: 755 
+
+  - name: copy do-artic-update
+    copy:
+      src: scripts/do-artic-update
+      dest: /usr/local/sbin/do-artic-update
+      owner: root
+      group: root
+      mode: 755 
+
   - name: install software-properties-common
     apt:
       name: software-properties-common
       state: present
 
-  - name: add ansible repository
-    apt_repository:
-      repo: ppa:ansible/ansible 
-
-  - name: apt update
-    apt:
-      name: ansible
-      update_cache: yes
-      state: present
-
-#  - name: install conda
-#    include_tasks: conda.yml 
-
-#  - name: install software
-#    include_tasks: software.yml
-
-  - name: install new stuff
-    include_tasks: newstuff.yml
+  - name: install software
+    include_tasks: software.yml
