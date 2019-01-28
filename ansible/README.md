@@ -39,7 +39,7 @@ You may want to configure a few things to your liking, via the system settings:
 
 ### Managing your lab-on-an-SSD ###
 
-*IMPORTANT: Do not disconnect your USB drive during operation, as this may lead to lost work, or even disk corruption.* You might want to use a sticky mat to help secure the disk to the table or even the back of your laptop screen.
+**IMPORTANT: Do not disconnect your USB drive during operation, as this may lead to lost work, or even disk corruption.** You might want to use a sticky mat to help secure the disk to the table or even the back of your laptop screen.
 
 ### Shutting down ###
 
@@ -51,8 +51,8 @@ The password, if you are logged-out, is "artic".
 
 You will need an external SSD drive, ideally with 256Gb or higher. USB sticks can be used but they are often much slower and less reliable so not recommended for long-term use.
 
-Download the latest lab-on-an-SSD image from:
-https://artic.climb.ac.uk
+Download the latest lab-on-an-SSD image from here:
+[SSD images](https://artic.climb.ac.uk/)
 Write the image to your SSD using software such as:
 - [Etcher](https://etcher.io/)
 - [Rufus](https://rufus.akeo.ie/)
