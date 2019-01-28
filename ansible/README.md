@@ -49,7 +49,7 @@ The password, if you are logged-out, is "artic".
 
 ### Making your own lab-on-an-SSD at home ###
 
-You will need an external SSD drive, ideally with 256Gb or higher. USB sticks can be used but they are often much slower and less reliable so not recommended for long-term use.
+You will need an external SSD drive, ideally with 256GB or higher (120GB minimum). USB sticks can be used but they are often much slower and less reliable so not recommended for long-term use.
 
 Download the latest lab-on-an-SSD image from here:
 [SSD images](https://artic.climb.ac.uk/)
