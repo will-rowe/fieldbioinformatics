@@ -2,3 +2,11 @@
 
 - hosts: 127.0.0.1
   connection: local
+
+  tasks:
+
+  - name: install libcurl3
+    apt:
+      name: libcurl3
+      state: present
+
