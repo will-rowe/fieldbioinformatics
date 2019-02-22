@@ -27,14 +27,14 @@
 
   - name: update guppy_basecaller file
     copy:
-      content: 'LD_PRELOAD=/tmp/libcurl/libcurl.so.4 /opt/ont/guppy/bin/guppy_basecaller'
+      content: 'LD_PRELOAD=/usr/local/libcurl3/lib/libcurl.so.4 /opt/ont/guppy/bin/guppy_basecaller'
       dest: /usr/bin/guppy_basecaller
       mode: 0755
       force: yes
 
   - name: update guppy_basecaller_1d2 file
     copy:
-      content: 'LD_PRELOAD=/tmp/libcurl/libcurl.so.4 /opt/ont/guppy/bin/guppy_basecaller_1d2'
+      content: 'LD_PRELOAD=/usr/local/libcurl3/lib/libcurl.so.4 /opt/ont/guppy/bin/guppy_basecaller_1d2'
       dest: /usr/bin/guppy_basecaller_1d2
       mode: 0755
       force: yes
