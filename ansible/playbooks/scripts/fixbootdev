@@ -1,2 +1,0 @@
-#!/bin/bash
-/sbin/parted $(findbootdev) set 2 legacy_boot on 
