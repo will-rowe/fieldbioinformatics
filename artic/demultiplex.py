@@ -11,7 +11,7 @@ import shutil
 def run(parser, args):
 	tmpdir = tempfile.mkdtemp(dir='.')
 
-	cmd = ("porechop --verbosity 2 --untrimmed -i \"%s\" -b %s --discard_middle --require_two_barcodes --barcode_threshold 80 --threads %s --check_reads 10000 --barcode_diff 5 > %s.demultiplexreport.txt" % (args.fasta, tmpdir, args.threads, args.fasta))
+	cmd = ("porechop --verbosity 2 --untrimmed -i \"%s\" -b %s --native_barcodes --discard_middle --require_two_barcodes --barcode_threshold 80 --threads %s --check_reads 10000 --barcode_diff 5 > %s.demultiplexreport.txt" % (args.fasta, tmpdir, args.threads, args.fasta))
 	print(cmd, file=sys.stderr)
 	os.system(cmd)
 
