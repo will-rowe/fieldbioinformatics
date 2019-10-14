@@ -25,6 +25,8 @@ def run(parser, args):
 	all_fastq_outfn = "%s_all.fastq" % (prefix)
 	all_fastq_outfh = open(all_fastq_outfn, "w")
 
+	summary_files = []
+
 	fastq = defaultdict(list)
 	for directory in args.directory:
 		if args.guppy:
@@ -37,6 +39,7 @@ def run(parser, args):
 			barcode_directory = paths[-1]
 
 			fastq[barcode_directory].extend([root+'/'+f for f in files if f.endswith('.fastq')])
+			summary_files.extend([root+'/'+f for f in files if f.find('sequencing_summary.txt') != -1])
 
 	for barcode_directory, fastq in list(fastq.items()):
 		if len(fastq):
@@ -68,18 +71,21 @@ def run(parser, args):
 
 	all_fastq_outfh.close()
 
-	print("Collecting summary files\n", file=sys.stderr)
+	print("Found the following summary files:\n", file=sys.stderr)
+	for summaryfn in summary_files:
+		print ("  " + summaryfn, file=sys.stderr)
 
 	dfs = []
 
 	summary_outfn = "%s_sequencing_summary.txt" % (prefix)
 	summaryfh = open(summary_outfn, "w")
 
-	for directory in args.directory:
-		d = '%s/sequencing_summary*.txt' % (directory,)
-		for summaryfn in glob.glob(d):
-			df = pd.read_csv(summaryfn, sep="\t")
-			dfs.append(df)
+	for summaryfn in summary_files:
+		df = pd.read_csv(summaryfn, sep="\t")
+		# support for local basecalling
+		if 'filename_fast5' in df.columns:
+			df['filename'] = df['filename_fast5']	
+		dfs.append(df)
 
 	pd.concat(dfs).to_csv(summaryfh, sep="\t", index=False)
 	summaryfh.close()
