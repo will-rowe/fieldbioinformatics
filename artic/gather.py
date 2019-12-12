@@ -29,10 +29,7 @@ def run(parser, args):
 
 	fastq = defaultdict(list)
 	for directory in args.directory:
-		if args.guppy:
-			d = '%s' % (directory)
-		else:
-			d = '%s/workspace/pass' % (directory)
+		d = directory
 
 		for root, dirs, files in os.walk(d):
 			paths = os.path.split(root)
