@@ -70,6 +70,7 @@ def run(parser, args):
 	      "barcodes": [ "NB%02d" ]
     }""" % (barcodes[n].replace("\"", "\\\""), n+1))
 		fh.write("] }")
+		fh.close()
 
 	cmd = "rampart --basecalledPath %s --protocol %s/%s --clearAnnotated" % (basecalledPath, args.protocol_directory, protocolPath)
 	print (cmd)
