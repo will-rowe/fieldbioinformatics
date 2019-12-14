@@ -41,31 +41,34 @@ def run(parser, args):
 
 	print (basecalledPath, protocolPath)	
 
-	barcodes = []
-	print ("Enter sample names:")
-	for barcode in range(1,25):
-		print (" NB%02d: " % (barcode,), end = "")
-		barcodes.append(input("> "))
+	if os.path.exists('run_configuration.json'):
+		reenter = input ("Do you want to enter sample names again? (Y/N): ")
+		if reenter.lower().startswith('y'):
+			barcodes = []
+			print ("Enter sample names:")
+			for barcode in range(1,25):
+				print (" NB%02d: " % (barcode,), end = "")
+				barcodes.append(input("> "))
 
-	fh = open("run_configuration.json", "w")
-	fh.write("""{
-  \"samples\": [
-	""")
-	first = True
-	for n, b in enumerate(barcodes):
-		if b:
-			if not first:
-				fh.write(",\n")
-			first = False
+			fh = open("run_configuration.json", "w")
 			fh.write("""{
-      "name": "%s",
-      "description": "",
-      "barcodes": [ "NB%02d" ]
+		  \"samples\": [
+			""")
+			first = True
+			for n, b in enumerate(barcodes):
+				if b:
+					if not first:
+						fh.write(",\n")
+					first = False
+					fh.write("""{
+		      "name": "%s",
+		      "description": "",
+		      "barcodes": [ "NB%02d" ]
     }""" % (barcodes[n].replace("\"", "\\\""), n+1))
-	fh.write("] }")
+			fh.write("] }")
 
 	cmd = "rampart --basecalledPath %s --protocol %s/%s --clearAnnotated" % (basecalledPath, args.protocol_directory, protocolPath)
 	print (cmd)
 
-	#os.system(cmd)
+	os.system(cmd)
 
