@@ -5,35 +5,44 @@ import sys
 from Bio import SeqIO
 from clint.textui import colored, puts, indent
 
+def chooser(directories):
+	print ("Found the following directories:")
+	for n, d in enumerate(directories):
+		print ("  [%d]: %s" % (n+1, d))
+	print ("Choose 0 to quit")
+  
+	while True:
+		choice = input("=> ")
+		try:
+			choice_number = int(choice)
+			if choice_number == 0:
+				raise SystemExit
+			path = directories[choice_number-1]
+			break
+		except Exception:
+			print ("Invalid choice, please select from the list above.")
+
+	return (path)
+
 def run(parser, args):
-	# scheme
-	# sample
-	# read_file
+	directories = []
 
-	if args.scheme.find('/') != -1:
-		scheme_name, scheme_version = args.scheme.split('/')
-	else:
-		scheme_name = args.scheme
-		scheme_version = "V1"
+	for root, dirs, files in os.walk(args.run_directory, topdown=False):
+		for d in dirs:
+			if d == 'fastq_pass':
+				directories.append(root+'/'+d)
 
-	ref = "%s/%s/%s/%s.reference.fasta" % (args.scheme_directory, scheme_name, scheme_version, scheme_name)
-	bed = "%s/%s/%s/%s.scheme.bed" % (args.scheme_directory, scheme_name, scheme_version, scheme_name)
+	basecalledPath = chooser(directories)
 
-	if args.read_file:
-		read_file = args.read_file
-	else:
-		read_file = "%s.fasta" % (args.sample)
+	directories = os.listdir(args.protocol_directory)
+	directories = [d for d in directories if os.path.isdir(args.protocol_directory+'/'+d)]
 
-	if not os.path.exists(ref):
-		print(colored.red('Scheme reference file not found: ') + ref)
-		raise SystemExit
-	if not os.path.exists(bed):
-		print(colored.red('Scheme BED file not found: ') + bed)
-		raise SystemExit
+	protocolPath = chooser(directories)
 
-	cmds.append("bwa index %s" % (ref,))
-	cmds.append("bwa mem -t %s -x ont2d %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
-	cmds.append("samtools index %s.sorted.bam" % (args.sample,))
+	print (basecalledPath, protocolPath)	
 
+	cmd = "rampart --basecalledPath %s --protocol %s/%s --clearAnnotated" % (basecalledPath, args.protocol_directory, protocolPath)
+	print (cmd)
 
+	os.system(cmd)
 

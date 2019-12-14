@@ -25,6 +25,8 @@ def run_subtool(parser, args):
         from . import rampart as submodule
     if args.command == 'filter':
         from . import filter as submodule
+    if args.command == 'run':
+        from . import run as submodule
 
     # run the chosen submodule.
     submodule.run(parser, args)
@@ -85,7 +87,6 @@ def main():
     parser_gather.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
     parser_gather.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
     parser_gather.add_argument('--prefix', help='Prefix for gathered files')
-    parser_gather.add_argument('--guppy', action='store_true', help='Gather up files produced by Guppy/Dogfish')
     parser_gather.set_defaults(func=run_subtool)
 
     # filter
@@ -96,11 +97,14 @@ def main():
     parser_filter.set_defaults(func=run_subtool)
 
     # rampart
-    parser_rampart = subparsers.add_parser('rampart', help='Make output file for RAMPART')
-    parser_rampart.add_argument('scheme', metavar='scheme', help='The name of the scheme.')
-    parser_rampart.add_argument('sample', metavar='sample', help='The name of the sample.')
-    parser_rampart.add_argument('--read-file', metavar='read_file', help='Use alternative FASTA/FASTQ file to <sample>.fasta')
+    parser_rampart = subparsers.add_parser('rampart', help='Interactive prompts to start RAMPART')
+    parser_rampart.add_argument('--protocol_directory', metavar='protocol_directory', help='The RAMPART protocols directory.', default='/home/artic/artic/artic-ebov/primer_schemes')
+    parser_rampart.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
     parser_rampart.set_defaults(func=run_subtool)
+
+    # run
+    parser_run = subparsers.add_parser('run', help='Process an entire run folder interactively')
+    parser_run.set_defaults(func=run_subtool)
 
     args = parser.parse_args()
 

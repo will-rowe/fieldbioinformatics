@@ -66,8 +66,8 @@ def run(parser, args):
         else:
                 indexed_nanopolish_file = read_file
 
-        cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
-        cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+        cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+        cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
 
         #python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
 
