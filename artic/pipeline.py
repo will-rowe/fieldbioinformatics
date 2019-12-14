@@ -98,7 +98,7 @@ def main():
 
     # rampart
     parser_rampart = subparsers.add_parser('rampart', help='Interactive prompts to start RAMPART')
-    parser_rampart.add_argument('--protocol_directory', metavar='protocol_directory', help='The RAMPART protocols directory.', default='/home/artic/artic/artic-ebov/primer_schemes')
+    parser_rampart.add_argument('--protocol_directory', metavar='protocol_directory', help='The RAMPART protocols directory.', default='/home/artic/artic/artic-ebov/rampart')
     parser_rampart.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
     parser_rampart.set_defaults(func=run_subtool)
 
