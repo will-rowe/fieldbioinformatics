@@ -38,12 +38,17 @@ def run(parser, args):
 	for directory in args.directory:
 		d = directory
 
+		print (d)
+
 		for root, dirs, files in os.walk(d):
 			paths = os.path.split(root)
 			barcode_directory = paths[-1]
 
 			fastq[barcode_directory].extend([root+'/'+f for f in files if f.endswith('.fastq')])
 			summary_files.extend([root+'/'+f for f in files if f.find('_summary.txt') != -1])
+
+			print (fastq)
+			print (summary_files)
 
 	for barcode_directory, fastq in list(fastq.items()):
 		if len(fastq):
