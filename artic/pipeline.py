@@ -83,10 +83,11 @@ def main():
 
     # gather
     parser_gather = subparsers.add_parser('gather', help='Gather up demultiplexed files')
-    parser_gather.add_argument('directory', nargs='+', metavar='directory', help='Albacore results directory or directories.')
+    parser_gather.add_argument('--directory', nargs='+', metavar='directory', help='Basecalled (guppy) results directory or directories.')
     parser_gather.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
     parser_gather.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
     parser_gather.add_argument('--prefix', help='Prefix for gathered files')
+    parser_gather.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
     parser_gather.set_defaults(func=run_subtool)
 
     # filter
@@ -98,7 +99,7 @@ def main():
 
     # rampart
     parser_rampart = subparsers.add_parser('rampart', help='Interactive prompts to start RAMPART')
-    parser_rampart.add_argument('--protocol_directory', metavar='protocol_directory', help='The RAMPART protocols directory.', default='/home/artic/artic/artic-ebov/rampart')
+    parser_rampart.add_argument('--protocol-directory', metavar='protocol_directory', help='The RAMPART protocols directory.', default='/home/artic/artic/artic-ebov/rampart')
     parser_rampart.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
     parser_rampart.set_defaults(func=run_subtool)
 

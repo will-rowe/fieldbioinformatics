@@ -7,13 +7,20 @@ import shutil
 import pandas as pd
 from collections import defaultdict
 
+from . import rampart
+
 # extract with constraints:
 #   -- only one group ever
 #   -- only one flowcell ID ever
 #   -- always unique read ID
 
 def run(parser, args):
-	if len(args.directory) and not args.prefix:
+	if not args.directory:
+        	directories = os.listdir(args.run_directory)
+        	directories = [d for d in directories if os.path.isdir(args.run_directory+'/'+d)]
+        	args.directory = [rampart.chooser(directories)]
+
+	if isinstance(args.directory, list) and len(args.directory) > 1 and not args.prefix:
 		print("Must supply a prefix if gathering multiple directories!", file=sys.stderr)
 		raise SystemExit
 

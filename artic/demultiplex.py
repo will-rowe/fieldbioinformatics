@@ -3,6 +3,8 @@ import tempfile
 import os
 import shutil
 
+from . import rampart
+
 # extract with constraints:
 #   -- only one group ever
 #   -- only one flowcell ID ever
