@@ -17,7 +17,7 @@ from . import rampart
 def run(parser, args):
 	if not args.directory:
         	directories = os.listdir(args.run_directory)
-        	directories = [d for d in directories if os.path.isdir(args.run_directory+'/'+d)]
+        	directories = [args.run_directory+'/'+d for d in directories if os.path.isdir(args.run_directory+'/'+d)]
         	args.directory = [rampart.chooser(directories)]
 
 	if isinstance(args.directory, list) and len(args.directory) > 1 and not args.prefix:
