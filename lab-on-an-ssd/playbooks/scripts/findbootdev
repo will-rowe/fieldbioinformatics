@@ -1,2 +1,0 @@
-#!/bin/bash
-readlink -f /dev/block/$(mountpoint -d /|cut -f 1 -d ":"):0
