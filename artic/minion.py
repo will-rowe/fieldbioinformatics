@@ -60,28 +60,33 @@ def run(parser, args):
     #covplot.R $sample.alignreport.txt
 
     # 6) do variant calling using the raw signal alignment
-    if not args.skip_nanopolish:
-        if args.nanopolish_read_file:
-                indexed_nanopolish_file = args.nanopolish_read_file
-        else:
-                indexed_nanopolish_file = read_file
+    if args.medaka:
+        cmds.append("medaka consensus --model %s %s.primertrimmed.sorted.bam %s.hdf" % (args.medaka_model, args.sample, args.sample))
+        cmds.append("medaka snp %s %s.hdf %s.primertrimmed.medaka.vcf" % (ref, args.sample, args.sample))
+        cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
+    else:
+        if not args.skip_nanopolish:
+            if args.nanopolish_read_file:
+                    indexed_nanopolish_file = args.nanopolish_read_file
+            else:
+                    indexed_nanopolish_file = read_file
 
-        cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
-        cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
 
-        #python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
+            #python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
 
-        # 7) do phasing
-        #nanopolish phase-reads --reads $sample.fasta --bam $sample.trimmed.sorted.bam --genome $ref $sample.vcf
+            # 7) do phasing
+            #nanopolish phase-reads --reads $sample.fasta --bam $sample.trimmed.sorted.bam --genome $ref $sample.vcf
 
-        # 8) variant frequency plot
-        cmds.append("vcfextract %s > %s.variants.tab" % (args.sample, args.sample))
+            # 8) variant frequency plot
+            cmds.append("vcfextract %s > %s.variants.tab" % (args.sample, args.sample))
 
-        # 8) filter the variants and produce a consensus
-        # here we use the vcf file without primer binding site trimming (to keep nanopolish happy with flanks)
-        # but we use the primertrimmed sorted bam file in order that primer binding sites do not count
-        # for the depth calculation to determine any low coverage sites that need masking
-        cmds.append("margin_cons %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
+            # 8) filter the variants and produce a consensus
+            # here we use the vcf file without primer binding site trimming (to keep nanopolish happy with flanks)
+            # but we use the primertrimmed sorted bam file in order that primer binding sites do not count
+            # for the depth calculation to determine any low coverage sites that need masking
+            cmds.append("margin_cons %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
 
     for cmd in cmds:
         print(colored.green("Running: ") + cmd, file=sys.stderr)
