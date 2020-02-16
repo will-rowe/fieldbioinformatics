@@ -13,11 +13,6 @@ def collect_depths(bamfile):
     if not os.path.exists(bamfile):
         raise SystemExit("bamfile %s doesn't exist" % (bamfile,))
 
-<<<<<<< HEAD
-=======
-    print(bamfile, file=sys.stderr)
-
->>>>>>> this file has been copied from the master branch
     p = subprocess.Popen(['samtools', 'depth', bamfile],
                              stdout=subprocess.PIPE)
     out, err = p.communicate()
@@ -29,21 +24,15 @@ def collect_depths(bamfile):
     return depths
 
 class Reporter:
-<<<<<<< HEAD
     def __init__(self, vcffile, depths):
         self.vcffile = vcffile
         self.depths = depths
-=======
-    def __init__(self, vcffile):
-        self.vcffile = vcffile
->>>>>>> this file has been copied from the master branch
 
     def report(self, r, status, allele):
         idfile = os.path.basename(self.vcffile).split(".")[0]
         print("%s\t%s\tstatus\t%s" % (idfile, r.POS, status), file=sys.stderr)
         print("%s\t%s\tallele\t%s" % (idfile, r.POS, allele), file=sys.stderr)
         print("%s\t%s\tref\t%s" % (idfile, r.POS, r.REF), file=sys.stderr)
-<<<<<<< HEAD
         print("%s\t%s\tdepth\t%s" % (idfile, r.POS, self.depths[r.CHROM][r.POS-1]), file=sys.stderr)
 
 def go(args):
@@ -51,15 +40,6 @@ def go(args):
 
     depths = collect_depths(args.bamfile)
     reporter = Reporter(args.vcffile, depths)
-=======
-
-def go(args):
-    reporter = Reporter(args.vcffile)
-
-    MASKED_POSITIONS = defaultdict(set)
-
-    depths = collect_depths(args.bamfile)
->>>>>>> this file has been copied from the master branch
 
     seqs = dict([(rec.id, rec) for rec in SeqIO.parse(open(args.reference), "fasta")])
     cons = {}
@@ -96,17 +76,12 @@ def go(args):
                 continue
 
             if record.num_het:
-<<<<<<< HEAD
                 if depths[record.CHROM][record.POS] < args.depth:
                     reporter.report(record, "het_site_low_depth", "y")
                     continue
                 else:
                     reporter.report(record, "het_site", "y")
                     continue
-=======
-                reporter.report(record, "het_site", "y")
-                continue
->>>>>>> this file has been copied from the master branch
 
             if 'PRIMER' in record.INFO:
                 reporter.report(record, "primer_binding_site", "n")
@@ -144,14 +119,10 @@ def go(args):
             elif len(REF) > len(ALT):
                 continue
             else:
-<<<<<<< HEAD
                 if depths[record.CHROM][record.POS] < args.depth:
                     reporter.report(record, "low_depth_variant", "n")
                 else:
                     reporter.report(record, "low_qual_variant", "n")
-=======
-                reporter.report(record, "low_qual_variant", "n")
->>>>>>> this file has been copied from the master branch
                 #cons[record.CHROM][record.POS-1] = 'N'
                 continue    
 
@@ -174,7 +145,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-<<<<<<< HEAD
-
-=======
->>>>>>> this file has been copied from the master branch

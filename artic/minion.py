@@ -43,8 +43,11 @@ def run(parser, args):
     nanopolish_header = get_nanopolish_header(ref)
 
     # 3) index the ref & align with bwa"
-    cmds.append("bwa index %s" % (ref,))
-    cmds.append("bwa mem -t %s -x ont2d %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
+    if args.minimap2:
+        cmds.append("minimap2 -a -x map-ont -t %s %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
+    else:
+        cmds.append("bwa index %s" % (ref,))
+        cmds.append("bwa mem -t %s -x ont2d %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
     cmds.append("samtools index %s.sorted.bam" % (args.sample,))
 
     # 4) trim the alignments to the primer start sites and normalise the coverage to save time
@@ -61,6 +64,8 @@ def run(parser, args):
 
     # 6) do variant calling using the raw signal alignment
     if args.medaka:
+        if os.path.exists("%s.hdf" % (args.sample)):
+            os.remove("%s.hdf" % (args.sample))
         cmds.append("medaka consensus %s.primertrimmed.sorted.bam %s.hdf" % (args.sample, args.sample))
         cmds.append("medaka snp %s %s.hdf %s.primertrimmed.medaka.vcf" % (ref, args.sample, args.sample))
         cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
