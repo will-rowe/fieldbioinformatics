@@ -64,8 +64,11 @@ def run(parser, args):
 
     # 6) do variant calling using the raw signal alignment
     if args.medaka:
+<<<<<<< HEAD
         if os.path.exists("%s.hdf" % (args.sample)):
             os.remove("%s.hdf" % (args.sample))
+=======
+>>>>>>> 186e8e3552d7fba42575c1b5dc03b40e08b8aa32
         cmds.append("medaka consensus %s.primertrimmed.sorted.bam %s.hdf" % (args.sample, args.sample))
         cmds.append("medaka snp %s %s.hdf %s.primertrimmed.medaka.vcf" % (ref, args.sample, args.sample))
         cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))

@@ -72,8 +72,12 @@ def main():
     parser_minion = subparsers.add_parser('minion', help='Run demultiplex')
     parser_minion.add_argument('scheme', metavar='scheme', help='The name of the scheme.')
     parser_minion.add_argument('sample', metavar='sample', help='The name of the sample.')
+<<<<<<< HEAD
     parser_minion.add_argument('--medaka', dest='medaka', action='store_true', help='Use medaka instead of nanopolish for variants')
     parser_minion.add_argument('--minimap2', dest='minimap2', action='store_true', help='Use minimap2 instead of bwa')
+=======
+    parser_minion.add_argument('--medaka', dest='medaka', type=bool, default=False, help='Use medaka instead of nanopolish for variants')
+>>>>>>> 186e8e3552d7fba42575c1b5dc03b40e08b8aa32
     parser_minion.add_argument('--normalise', dest='normalise', type=int, default=100, help='Normalise down to moderate coverage to save runtime.')
     parser_minion.add_argument('--threads', type=int, default=8, help='Number of threads')
     parser_minion.add_argument('--scheme-directory', metavar='scheme_directory', default='/artic/schemes', help='Default scheme directory')
