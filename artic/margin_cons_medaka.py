@@ -73,6 +73,7 @@ def go(args):
 
             if record.POS in MASKED_POSITIONS[record.CHROM]:
                 reporter.report(record, "masked_manual", "n")
+                cons[record.CHROM][record.POS-1] = 'N'
                 continue
 
             if record.num_het:
