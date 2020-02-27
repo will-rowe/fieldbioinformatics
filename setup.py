@@ -31,6 +31,7 @@ setup(
         'console_scripts': [
             'artic=artic.pipeline:main',
             'align_trim=artic.align_trim:main',
+            'align_trim_n=artic.align_trim_n:main',
             'margin_cons=artic.margin_cons:main',
             'vcfextract=artic.vcfextract:main',
         ],
