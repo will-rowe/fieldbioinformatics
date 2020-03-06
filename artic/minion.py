@@ -68,7 +68,7 @@ def run(parser, args):
             os.remove("%s.hdf" % (args.sample))
         cmds.append("medaka consensus %s.primertrimmed.sorted.bam %s.hdf" % (args.sample, args.sample))
         cmds.append("medaka snp %s %s.hdf %s.primertrimmed.medaka.vcf" % (ref, args.sample, args.sample))
-        cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
+        cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta 2> %s.report.txt" % (ref, args.sample, args.sample, args.sample, args.sample))
     else:
         if not args.skip_nanopolish:
             if args.nanopolish_read_file:

@@ -82,6 +82,7 @@ def go(args):
                     continue
                 else:
                     reporter.report(record, "het_site", "y")
+                    cons[record.CHROM][record.POS-1] = 'N'
                     continue
 
             if 'PRIMER' in record.INFO:
@@ -120,7 +121,7 @@ def go(args):
             elif len(REF) > len(ALT):
                 continue
             else:
-                if depths[record.CHROM][record.POS] < args.depth:
+                if depths[record.CHROM][record.POS-1] < args.depth:
                     reporter.report(record, "low_depth_variant", "n")
                 else:
                     reporter.report(record, "low_qual_variant", "n")
