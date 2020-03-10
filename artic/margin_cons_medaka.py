@@ -18,9 +18,9 @@ def collect_depths(bamfile):
     out, err = p.communicate()
     depths = defaultdict(dict)
     for ln in out.decode('utf-8').split("\n"):
-            if ln:
-                    contig, pos, depth = ln.split("\t")
-                    depths[contig][int(pos)] = int(depth)
+       if ln:
+          contig, pos, depth = ln.split("\t")
+          depths[contig][int(pos)] = int(depth)
     return depths
 
 class Reporter:
@@ -33,7 +33,7 @@ class Reporter:
         print("%s\t%s\tstatus\t%s" % (idfile, r.POS, status), file=sys.stderr)
         print("%s\t%s\tallele\t%s" % (idfile, r.POS, allele), file=sys.stderr)
         print("%s\t%s\tref\t%s" % (idfile, r.POS, r.REF), file=sys.stderr)
-        print("%s\t%s\tdepth\t%s" % (idfile, r.POS, self.depths[r.CHROM][r.POS-1]), file=sys.stderr)
+        print("%s\t%s\tdepth\t%s" % (idfile, r.POS, self.depths[r.CHROM][r.POS]), file=sys.stderr)
 
 def go(args):
     MASKED_POSITIONS = defaultdict(set)
@@ -121,7 +121,7 @@ def go(args):
             elif len(REF) > len(ALT):
                 continue
             else:
-                if depths[record.CHROM][record.POS-1] < args.depth:
+                if depths[record.CHROM][record.POS] < args.depth:
                     reporter.report(record, "low_depth_variant", "n")
                 else:
                     reporter.report(record, "low_qual_variant", "n")
