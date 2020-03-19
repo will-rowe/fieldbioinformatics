@@ -55,7 +55,6 @@ def run(parser, args):
 							continue
 						r = random()
 						if r >= args.sample:
-							print("incld")
 							continue
 
 						if rec.id not in dups:
