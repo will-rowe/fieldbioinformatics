@@ -111,11 +111,23 @@ def go(args):
         print("QueryName\tReferenceStart\tReferenceEnd\tPrimerPair\tPrimer1\tPrimer1Start\tPrimer2\tPrimer2Start\tIsSecondary\tIsSupplementary\tStart\tEnd\tCorrectlyPaired", file=reportfh)
 
     bed = read_bed_file(args.bedfile)
+    pools = set([row['PoolName'] for row in bed])
+    pools.add('unmatched')
+
+    infile = pysam.AlignmentFile("-", "rb")
+
+    bam_header = infile.header.copy().to_dict()
+
+    if not args.no_read_groups:
+        bam_header['RG'] = []
+        for pool in pools:
+            read_group = {}
+            read_group['ID'] = pool
+            bam_header['RG'].append(read_group)
 
     counter = defaultdict(int)
 
-    infile = pysam.AlignmentFile("-", "rb")
-    outfile = pysam.AlignmentFile("-", "wh", template=infile)
+    outfile = pysam.AlignmentFile("-", "wh", header=bam_header)
     for s in infile:
         cigar = copy(s.cigartuples)
 
@@ -134,6 +146,11 @@ def go(args):
         p2 = find_primer(bed, s.reference_end, '-')
 
         correctly_paired = is_correctly_paired(p1, p2)
+        if not args.no_read_groups:
+            if correctly_paired:
+                s.set_tag('RG', p1[2]['PoolName'])
+            else:
+                s.set_tag('RG', 'unmatched')
 
         report = "%s\t%s\t%s\t%s_%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d" % (s.query_name, s.reference_start, s.reference_end, p1[2]['Primer_ID'], p2[2]['Primer_ID'], p1[2]['Primer_ID'], abs(p1[1]), p2[2]['Primer_ID'], abs(p2[1]), s.is_secondary, s.is_supplementary, p1[2]['start'], p2[2]['end'], correctly_paired)
         if args.report:
@@ -182,7 +199,8 @@ def go(args):
 
         outfile.write(s)
 
-    reportfh.close()
+    if args.report:
+        reportfh.close()
 
 def main():
     import argparse
@@ -192,6 +210,7 @@ def main():
     parser.add_argument('--normalise', type=int, help='Subsample to n coverage per strand')
     parser.add_argument('--report', type=str, help='Output report to file')
     parser.add_argument('--start', action='store_true', help='Trim to start of primers instead of ends')
+    parser.add_argument('--no-read-groups', dest='no_read_groups', action='store_true', help='Do not divide reads into groups in SAM output')
     parser.add_argument('--verbose', action='store_true', help='Debug mode')
 
     args = parser.parse_args()

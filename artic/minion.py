@@ -43,8 +43,8 @@ def run(parser, args):
     nanopolish_header = get_nanopolish_header(ref)
 
     # 3) index the ref & align with bwa"
-    if args.minimap2:
-        cmds.append("minimap2 -a -x map-ont -t %s %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
+    if not args.bwa:
+        cmds.append("minimap2 -a -x map-ont -t %s %s %s | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
     else:
         cmds.append("bwa index %s" % (ref,))
         cmds.append("bwa mem -t %s -x ont2d %s %s | samtools view -bS - | samtools sort -o %s.sorted.bam -" % (args.threads, ref, read_file, args.sample))
@@ -55,10 +55,16 @@ def run(parser, args):
         normalise_string = '--normalise %d' % (args.normalise)
     else:
         normalise_string = ''
-    cmds.append("align_trim --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-    cmds.append("align_trim %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-    cmds.append("samtools index %s.trimmed.sorted.bam" % (args.sample))
-    cmds.append("samtools index %s.primertrimmed.sorted.bam" % (args.sample))
+    if args.medaka:
+        cmds.append("align_trim --no-read-groups --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+        cmds.append("align_trim %s %s --no-read-groups --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+        cmds.append("samtools index %s.trimmed.sorted.bam" % (args.sample))
+        cmds.append("samtools index %s.primertrimmed.sorted.bam" % (args.sample))
+    else:
+        cmds.append("align_trim --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.trimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+        cmds.append("align_trim %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.primertrimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+        cmds.append("samtools index %s.trimmed.rg.sorted.bam" % (args.sample))
+        cmds.append("samtools index %s.primertrimmed.rg.sorted.bam" % (args.sample))
 
     #covplot.R $sample.alignreport.txt
 
@@ -76,8 +82,10 @@ def run(parser, args):
             else:
                     indexed_nanopolish_file = read_file
 
-            cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.sorted.bam -g %s -w \"%s\"  --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
-            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.sorted.bam -g %s -w \"%s\" --snps --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.pool1.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1 --read-group nCoV-2019_1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.pool2.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1 --read-group nCoV-2019_2" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
 
             #python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
 

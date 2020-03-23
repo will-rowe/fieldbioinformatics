@@ -13,6 +13,7 @@ def read_bed_file(fn):
 		for row in reader:
 			bedrow = {}
 			bedrow['Primer_ID'] = row[3]
+			bedrow['PoolName'] = row[4]
 			
 			if len(row) >= 6:
 				# new style bed
