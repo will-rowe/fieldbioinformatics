@@ -76,6 +76,7 @@ def read_bed_file(fn):
             # read row of bed file into a dictionary
             bedrow = {}
             bedrow['Primer_ID'] = row[3]
+            bedrow['PoolName'] = row[4]
 
             # check the bed format
             if len(row) >= 6:
