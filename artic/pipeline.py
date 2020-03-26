@@ -27,6 +27,8 @@ def run_subtool(parser, args):
         from . import filter as submodule
     if args.command == 'run':
         from . import run as submodule
+    if args.command == 'guppyplex':
+        from . import guppyplex as submodule
 
     # run the chosen submodule.
     submodule.run(parser, args)
@@ -91,6 +93,19 @@ def main():
     parser_gather.add_argument('--prefix', help='Prefix for gathered files')
     parser_gather.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
     parser_gather.set_defaults(func=run_subtool)
+
+    # guppyplex
+    # This is a workflow that aggregates the previous gather and demultiplex steps into a single task.
+    # This is making an assumption that the results from MinKnow demultiplex are good-enough.
+    parser_guppyplex = subparsers.add_parser('guppyplex', help='Aggregate pre-demultiplexed reads from MinKNOW/Guppy')
+    parser_guppyplex.add_argument('--directory', metavar='directory', help='Basecalled and demultiplexed (guppy) results directory', required=True)
+    parser_guppyplex.add_argument('--max-length', type=int, metavar='max_length', help='remove reads greater than read length')
+    parser_guppyplex.add_argument('--min-length', type=int, metavar='min_length', help='remove reads less than read length')
+    parser_guppyplex.add_argument('--quality', type=float, metavar='quality', default=7, help='remove reads against this quality filter')
+    parser_guppyplex.add_argument('--sample', type=float, metavar='sample', default=1, help='sampling frequency for random sample of sequence to reduce excess')
+    parser_guppyplex.add_argument('--prefix', help='Prefix for guppyplex files')
+    parser_guppyplex.add_argument('--run-directory', metavar='run_directory', help='The run directory', default='/var/lib/MinKNOW/data')
+    parser_guppyplex.set_defaults(func=run_subtool)
 
     # filter
     parser_filter = subparsers.add_parser('filter', help='Filter FASTQ files by length')
