@@ -35,6 +35,9 @@ setup(
             'margin_cons=artic.margin_cons:main',
             'margin_cons_medaka=artic.margin_cons_medaka:main',
             'vcfextract=artic.vcfextract:main',
+            'artic_vcf_merge=artic.vcf_merge:main',
+            'artic_vcf_filter=artic.vcf_filter:main',
+            'artic_make_depth_mask=artic.make_depth_mask:main'
         ],
     },
     author_email="n.j.loman@bham.ac.uk",

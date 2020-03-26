@@ -82,6 +82,7 @@ def main():
     parser_minion.add_argument('--read-file', metavar='read_file', help='Use alternative FASTA/FASTQ file to <sample>.fasta')
     parser_minion.add_argument('--nanopolish-read-file', metavar='nanopolish_read_file', help='Use alternative read file (previously indexed)')
     parser_minion.add_argument('--skip-nanopolish', action='store_true')
+    parser_minion.add_argument('--dry-run', action='store_true')
     parser_minion.set_defaults(func=run_subtool)
 
     # gather

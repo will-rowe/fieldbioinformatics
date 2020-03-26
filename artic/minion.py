@@ -4,6 +4,7 @@ import os
 import sys
 from Bio import SeqIO
 from clint.textui import colored, puts, indent
+from .vcftagprimersites import read_bed_file
 
 def get_nanopolish_header(ref):
     recs = list(SeqIO.parse(open(ref), "fasta"))
@@ -38,6 +39,8 @@ def run(parser, args):
         print(colored.red('Scheme BED file not found: ') + bed)
         raise SystemExit
 
+    pools = set([row['PoolName'] for row in read_bed_file(bed)])
+
     cmds = []
 
     nanopolish_header = get_nanopolish_header(ref)
@@ -55,26 +58,34 @@ def run(parser, args):
         normalise_string = '--normalise %d' % (args.normalise)
     else:
         normalise_string = ''
-    if args.medaka:
-        cmds.append("align_trim --no-read-groups --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-        cmds.append("align_trim %s %s --no-read-groups --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-        cmds.append("samtools index %s.trimmed.sorted.bam" % (args.sample))
-        cmds.append("samtools index %s.primertrimmed.sorted.bam" % (args.sample))
-    else:
-        cmds.append("align_trim --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.trimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-        cmds.append("align_trim %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools view -bS - | samtools sort -T %s - -o %s.primertrimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
-        cmds.append("samtools index %s.trimmed.rg.sorted.bam" % (args.sample))
-        cmds.append("samtools index %s.primertrimmed.rg.sorted.bam" % (args.sample))
+#    if args.medaka:
+#        cmds.append("align_trim --no-read-groups --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+#        cmds.append("align_trim %s %s --no-read-groups --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+#        cmds.append("samtools index %s.trimmed.sorted.bam" % (args.sample))
+#        cmds.append("samtools index %s.primertrimmed.sorted.bam" % (args.sample))
+#    else:
+    cmds.append("align_trim --start %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.trimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+    cmds.append("align_trim %s %s --report %s.alignreport.txt < %s.sorted.bam 2> %s.alignreport.er | samtools sort -T %s - -o %s.primertrimmed.rg.sorted.bam" % (normalise_string, bed, args.sample, args.sample, args.sample, args.sample, args.sample))
+    cmds.append("samtools index %s.trimmed.rg.sorted.bam" % (args.sample))
+    cmds.append("samtools index %s.primertrimmed.rg.sorted.bam" % (args.sample))
 
-    #covplot.R $sample.alignreport.txt
+    if args.medaka:
+       for p in pools:
+          cmds.append("samtools view -b -r \"%s\" %s.primertrimmed.rg.sorted.bam > %s.primertrimmed.%s.sorted.bam" % (p, args.sample, args.sample, p))
+          cmds.append("samtools index %s.primertrimmed.%s.sorted.bam" % (args.sample, p))
 
     # 6) do variant calling using the raw signal alignment
     if args.medaka:
-        if os.path.exists("%s.hdf" % (args.sample)):
-            os.remove("%s.hdf" % (args.sample))
-        cmds.append("medaka consensus %s.primertrimmed.sorted.bam %s.hdf" % (args.sample, args.sample))
-        cmds.append("medaka snp %s %s.hdf %s.primertrimmed.medaka.vcf" % (ref, args.sample, args.sample))
-        cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta 2> %s.report.txt" % (ref, args.sample, args.sample, args.sample, args.sample))
+        if os.path.exists("%s.pool1.hdf" % (args.sample)):
+            os.remove("%s.pool1.hdf" % (args.sample))
+        if os.path.exists("%s.pool2.hdf" % (args.sample)):
+            os.remove("%s.pool2.hdf" % (args.sample))
+
+        for p in pools:
+            cmds.append("medaka consensus %s.primertrimmed.%s.sorted.bam %s.%s.hdf" % (args.sample, p, args.sample, p))
+            cmds.append("medaka snp %s %s.%s.hdf %s.primertrimmed.%s.medaka.vcf" % (ref, args.sample, p, args.sample, p))
+
+        #cmds.append("margin_cons_medaka --depth 20 --quality 10 %s %s.primertrimmed.medaka.vcf %s.primertrimmed.sorted.bam > %s.consensus.fasta 2> %s.report.txt" % (ref, args.sample, args.sample, args.sample, args.sample))
     else:
         if not args.skip_nanopolish:
             if args.nanopolish_read_file:
@@ -82,10 +93,25 @@ def run(parser, args):
             else:
                     indexed_nanopolish_file = read_file
 
-            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.pool1.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1 --read-group nCoV-2019_1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
-            cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.pool2.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1 --read-group nCoV-2019_2" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+            for p in pools:
+               cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.%s.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1 --read-group %s" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, p, args.sample, ref, nanopolish_header, p))
+
             cmds.append("nanopolish variants --min-flanking-sequence 10 --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.vcf -b %s.trimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
             cmds.append("nanopolish variants --fix-homopolymers -x %s --progress -t %s --reads %s -o %s.primertrimmed.vcf -b %s.primertrimmed.rg.sorted.bam -g %s -w \"%s\" --ploidy 1 -m 0.1" % (args.max_haplotypes, args.threads, indexed_nanopolish_file, args.sample, args.sample, ref, nanopolish_header))
+
+            merge_vcf_cmd = "artic_vcf_merge %s %s" % (args.sample, bed)
+            for p in pools:
+                merge_vcf_cmd += " %s:%s.%s.vcf" % (p, args.sample, p)
+            cmds.append(merge_vcf_cmd)
+
+            cmds.append("artic_vcf_filter %s.merged.vcf %s.filtered.vcf" % (args.sample, args.sample))
+
+            cmds.append("artic_make_depth_mask %s %s.primertrimmed.rg.sorted.bam %s.coverage_mask.txt" % (ref, args.sample, args.sample))
+
+            cmds.append("bgzip %s.filtered.vcf" % (args.sample))
+            cmds.append("tabix -p vcf %s.filtered.vcf.gz" % (args.sample))
+
+            cmds.append("bcftools consensus -f %s %s.filtered.vcf.gz -m %s.coverage_mask.txt -I" % (ref, args.sample, args.sample))
 
             #python nanopore-scripts/expand-cigar.py --bam "$sample".primertrimmed.sorted.bam --fasta $ref | python nanopore-scripts/count-errors.py /dev/stdin > "$sample".errors.txt
 
@@ -93,20 +119,22 @@ def run(parser, args):
             #nanopolish phase-reads --reads $sample.fasta --bam $sample.trimmed.sorted.bam --genome $ref $sample.vcf
 
             # 8) variant frequency plot
-            cmds.append("vcfextract %s > %s.variants.tab" % (args.sample, args.sample))
+            #cmds.append("vcfextract %s > %s.variants.tab" % (args.sample, args.sample))
 
             # 8) filter the variants and produce a consensus
             # here we use the vcf file without primer binding site trimming (to keep nanopolish happy with flanks)
             # but we use the primertrimmed sorted bam file in order that primer binding sites do not count
             # for the depth calculation to determine any low coverage sites that need masking
-            cmds.append("margin_cons %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
+            #cmds.append("margin_cons %s %s.vcf %s.primertrimmed.sorted.bam a > %s.consensus.fasta" % (ref, args.sample, args.sample, args.sample))
 
     for cmd in cmds:
         print(colored.green("Running: ") + cmd, file=sys.stderr)
         print(cmd, file=logfh)
-        retval = os.system(cmd)
-        if retval != 0:
-            print(colored.red('Command failed:' ) + cmd, file=sys.stderr)
+        if not args.dry_run:
+            retval = os.system(cmd)
+            if retval != 0:
+                print(colored.red('Command failed:' ) + cmd, file=sys.stderr)
+                raise SystemExit(20)
 
     logfh.close()
 
