@@ -51,7 +51,7 @@ def run(parser, args):
 							continue
 						if args.min_length and len(rec) < args.min_length:
 							continue
-						if get_read_mean_quality(rec) >= args.quality:
+						if get_read_mean_quality(rec) < args.quality:
 							continue
 						r = random()
 						if r >= args.sample:
